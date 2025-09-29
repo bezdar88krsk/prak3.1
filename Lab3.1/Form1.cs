@@ -21,6 +21,10 @@ namespace Lab3._1
             dataGridView1.DataSource = logic.Players;
             logic.AddPlayer(7,"Ronaldo","Portugal",Position.SmallForward,180,75);
             comboBox1.SelectedIndex = 0;
+            foreach(var nation in logic.GetNations())
+            {
+                comboBox2.Items.Add(nation);
+            }
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -61,6 +65,21 @@ namespace Lab3._1
             {
                 dataGridView1.DataSource = logic.Players;
             }
+        }
+
+        private void checkBox2_CheckedChanged(object sender, EventArgs e)
+        {
+            button5.Visible = checkBox2.Checked;
+            comboBox2.Visible = checkBox2.Checked;
+            if (!checkBox2.Checked)
+            {
+                dataGridView1.DataSource = logic.Players;
+            }
+        }
+
+        private void button5_Click(object sender, EventArgs e)
+        {
+            dataGridView1.DataSource = logic.GroupByNation(comboBox2.Text);
         }
     }
 }

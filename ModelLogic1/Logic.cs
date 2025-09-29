@@ -83,6 +83,15 @@ namespace ModelLogic1
             }
             return null;
         }
+        public BindingList<Player> GroupByNation(string nation)
+        {
+            BindingList<Player> groupedPlayers = new BindingList<Player>(Players.Where(p => p.Nation == nation).ToList());
+            return groupedPlayers;
+        }
+        public List<string> GetNations()
+        {
+            return Players.Select(p => p.Nation).ToList();
+        }
         //public List<Player> GetPlayers()
         //{
         //    return Players;
