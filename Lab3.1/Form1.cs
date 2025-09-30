@@ -21,16 +21,16 @@ namespace Lab3._1
             dataGridView1.DataSource = logic.Players;
             logic.AddPlayer(7,"Ronaldo","Portugal",Position.SmallForward,180,75);
             comboBox1.SelectedIndex = 0;
-            foreach(var nation in logic.GetNations())
-            {
-                comboBox2.Items.Add(nation);
-            }
+            
         }
 
         private void button1_Click(object sender, EventArgs e)
         {
             Form addForm = new AddForm(logic);
             addForm.ShowDialog();
+            checkBox1.Checked = false;
+            checkBox2.Checked = false;
+            dataGridView1.Refresh();  
         }
 
         private void Form1_Load(object sender, EventArgs e)
@@ -41,7 +41,7 @@ namespace Lab3._1
         private void button3_Click(object sender, EventArgs e)
         {
             label1.Text = dataGridView1.SelectedCells[0].Value.ToString();
-            logic.RemovePlayer(Convert.ToInt32(dataGridView1.SelectedCells[0].Value));
+            logic.RemovePlayerById(Convert.ToInt32(dataGridView1.SelectedCells[0].Value));
         }
 
         private void button4_Click(object sender, EventArgs e)
@@ -54,7 +54,7 @@ namespace Lab3._1
 
         private void button2_Click(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = logic.GroupByPosition(logic.ConvertPosition(comboBox1.Text));
+            dataGridView1.DataSource = logic.GroupByPosition(logic.ConvertPosition(comboBox1.Text), (BindingList<Player>)dataGridView1.DataSource);
         }
 
         private void checkBox1_CheckedChanged(object sender, EventArgs e)
@@ -64,6 +64,13 @@ namespace Lab3._1
             if (!checkBox1.Checked)
             {
                 dataGridView1.DataSource = logic.Players;
+            }
+            else
+            {
+                foreach (var nation in logic.GetNations())
+                {
+                    comboBox2.Items.Add(nation);
+                }
             }
         }
 
@@ -79,7 +86,13 @@ namespace Lab3._1
 
         private void button5_Click(object sender, EventArgs e)
         {
-            dataGridView1.DataSource = logic.GroupByNation(comboBox2.Text);
+            dataGridView1.DataSource = logic.GroupByNation(comboBox2.Text, (BindingList<Player>)dataGridView1.DataSource);
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            GroupForm groupForm = new GroupForm(logic);
+            groupForm.ShowDialog();
         }
     }
 }
