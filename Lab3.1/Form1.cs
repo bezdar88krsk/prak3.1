@@ -41,7 +41,7 @@ namespace Lab3._1
         private void button3_Click(object sender, EventArgs e)
         {
             label1.Text = dataGridView1.SelectedCells[0].Value.ToString();
-            logic.RemovePlayerById(Convert.ToInt32(dataGridView1.SelectedCells[0].Value));
+            logic.RemovePlayerByID(Convert.ToInt32(dataGridView1.SelectedCells[0].Value));
         }
 
         private void button4_Click(object sender, EventArgs e)

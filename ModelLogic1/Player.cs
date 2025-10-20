@@ -6,6 +6,10 @@ using System.Threading.Tasks;
 
 namespace ModelLogic1
 {
+    public interface IDomainObject
+    {
+        int ID { get; set; }
+    }
     public enum Position
     {
         PointGuard,
@@ -13,9 +17,9 @@ namespace ModelLogic1
         PowerForward,
         Center
     }
-    public class Player
+    public class Player : IDomainObject
     {
-        public int Id { get; set; }
+        public int ID { get; set; }
         public int Number { get; set; }
         public string Name { get; set; }
         public string Nation { get; set; }
@@ -32,7 +36,7 @@ namespace ModelLogic1
         }
         public Player(int id, int number, string name, string nation, Position position, int height, int weight)
         {
-            Id = id;
+            ID = id;
             Number = number;
             Name = name;
             Nation = nation;
@@ -40,9 +44,9 @@ namespace ModelLogic1
             Height = height;
             Weight = weight;
         }
-        public int GetId()
+        public int GetID()
         {
-            return Id;
+            return ID;
         }
 
 

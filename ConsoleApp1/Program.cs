@@ -131,7 +131,7 @@ namespace ConsoleApp1
             Position pos = logic.ConvertPosition(ChooseOption(logic.GetPositions(), "Выберите позицию"));
             foreach (var player in logic.GroupByPosition(pos,logic.Players))
             {
-                Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.Id, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
+                Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
             }
             Console.ReadKey();
         }
@@ -144,7 +144,7 @@ namespace ConsoleApp1
             string nation = logic.Players[(ChooseOption(logic.GetNationsArray(), "Выберите позицию"))].Nation;
             foreach (var player in logic.GroupByNation(nation, logic.Players))
             {
-                Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.Id, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
+                Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
             }
             Console.ReadKey();
         }
@@ -153,7 +153,7 @@ namespace ConsoleApp1
         /// </summary>
         /// <param name="menuItems">списко вариантов</param>
         /// <param name="text">текст, который необходимо выводить при отображении опций</param>
-        /// <returns></returns>
+        /// <returns>возвращает индекс выбранного варианта</returns>
         static int ChooseOption(string[] menuItems, string text)
         {
             
@@ -207,7 +207,7 @@ namespace ConsoleApp1
                         Console.Clear();
                         foreach (var player in logic.Players)
                         {
-                            Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.Id, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
+                            Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
                         }
                         Console.ReadKey();
                         break;

@@ -41,7 +41,7 @@ namespace Lab3._1
         }
         private void button1_Click(object sender, EventArgs e)
         {
-           Logic.ChangePlayerById(PlayerId,Convert.ToInt32(textBox2.Text),textBox1.Text,textBox3.Text,Logic.ConvertPosition(comboBox1.Text),Convert.ToInt32(textBox4.Text),Convert.ToInt32(textBox5.Text));
+           Logic.ChangePlayerByID(PlayerId,Convert.ToInt32(textBox2.Text),textBox1.Text,textBox3.Text,Logic.ConvertPosition(comboBox1.Text),Convert.ToInt32(textBox4.Text),Convert.ToInt32(textBox5.Text));
            this.Close();
         }
     }
