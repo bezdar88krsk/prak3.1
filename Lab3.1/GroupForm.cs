@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using ProjectLogic;
 using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Lab3._1
@@ -31,7 +32,8 @@ namespace Lab3._1
                 groups[pos] = group;
                 listView1.Groups.Add(group);
             }
-            foreach (var player in logic.Players)
+            var Players = logic.LoadAllPlayers();
+            foreach (var player in Players)
             {
                 var item = new ListViewItem(player.Name);
                 item.SubItems.Add(player.Number.ToString());

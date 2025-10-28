@@ -136,6 +136,10 @@
       <Project>{aeb915b9-b8c1-4ed4-a865-b86b5cecfd70}</Project>
       <Name>ModelLogic1</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ProjectLogic\ProjectLogic.csproj">
+      <Project>{99ad3fb8-8127-46fc-995e-07290d9f5d56}</Project>
+      <Name>ProjectLogic</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

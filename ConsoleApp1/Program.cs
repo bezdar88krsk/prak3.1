@@ -5,6 +5,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using ModelLogic1;
+using ProjectLogic;
 namespace ConsoleApp1
 {
     internal class Program
@@ -45,22 +46,32 @@ namespace ConsoleApp1
         /// </summary>
         static void ChangePlayerOption()
         {
-            string name,nation;
-            int number, height, weight;
-            Position position;
             Console.Clear();
-            int index = ChooseOption(logic.PlayersToStrings(), "Выберите игрока");
-            Console.WriteLine("--Изменение игрока--");
-            name = logic.GetPlayerByIndex(index).Name;
-            number = logic.GetPlayerByIndex(index).Number;
-            nation = logic.GetPlayerByIndex(index).Nation;
-            weight = logic.GetPlayerByIndex(index).Weight;
-            height = logic.GetPlayerByIndex(index).Height;
-            position = logic.GetPlayerByIndex(index).Position;
-            string[] props = new string[] {"Имя","Номер", "Нация", "Позиция", "Рост", "Вес" };
-            int choose = ChooseOption(props,"ВЫБЕРИТЕ СВОЙСТВО, КОТОРОЕ ХОТИТЕ ПОМЕНЯТЬ");
+
+            // Получаем всех игроков
+            var players = logic.LoadAllPlayers();
+
+            // Массив строк с описанием игроков для меню выбора
+            string[] playerDescriptions = players.Select(p => $"{p.Name} (ID: {p.ID})").ToArray();
+
+            // Выбор игрока по индексу в списке
+            int selectedIndex = ChooseOption(playerDescriptions, "Выберите игрока");
+
+            // Получаем выбранного игрока по индексу
+            Player selectedPlayer = players[selectedIndex];
+
+            string name = selectedPlayer.Name;
+            int number = selectedPlayer.Number;
+            string nation = selectedPlayer.Nation;
+            int weight = selectedPlayer.Weight;
+            int height = selectedPlayer.Height;
+            Position position = selectedPlayer.Position;
+
+            string[] props = new string[] { "Имя", "Номер", "Нация", "Позиция", "Рост", "Вес" };
+            int choose = ChooseOption(props, "ВЫБЕРИТЕ СВОЙСТВО, КОТОРОЕ ХОТИТЕ ПОМЕНЯТЬ");
             Console.Clear();
-            switch(choose)
+
+            switch (choose)
             {
                 case 0:
                     Console.WriteLine($"Старое имя:\t{name}");
@@ -76,7 +87,7 @@ namespace ConsoleApp1
                     nation = Console.ReadLine();
                     break;
                 case 3:
-                    Position pos = logic.ConvertPosition(ChooseOption(logic.GetPositions(), $"Выберите позицию, старая позиция \t{position.ToString()}"));
+                    position = logic.ConvertPosition(ChooseOption(logic.GetPositions(), $"Выберите позицию, старая позиция \t{position.ToString()}"));
                     Console.Clear();
                     break;
                 case 4:
@@ -87,20 +98,33 @@ namespace ConsoleApp1
                     Console.WriteLine($"Старый вес \t{weight}");
                     weight = IntInput();
                     break;
-                    
             }
-            logic.ChangePlayerByIndex(index,number,name,nation,position,height,weight);
+
+            
+            logic.ChangePlayerByID(selectedPlayer.ID, number, name, nation, position, height, weight);
+
             Console.WriteLine("Игрок изменен");
             Console.WriteLine("Нажмите любую клавишу, чтобы продолжить");
             Console.ReadKey();
-          
         }
         /// <summary>
         /// Запускает опцию удаления игрока
         /// </summary>
         static void RemovePlayerOption()
         {
-            logic.RemovePlayerByIndex(ChooseOption(logic.PlayersToStrings(),"Выберите игрока"));
+            var players = logic.LoadAllPlayers();
+
+            // Создать массив строк для выбора игрока, например, "Имя (ID)"
+            string[] playerDescriptions = players.Select(p => $"{p.Number} {p.Name} (ID: {p.Position} {p.Nation}").ToArray();
+
+            // Запросить у пользователя выбор индекса из этого списка
+            int selectedIndex = ChooseOption(playerDescriptions, "Выберите игрока");
+
+            // Получить ID выбранного игрока по его индексу в списке
+            int selectedPlayerId = players[selectedIndex].ID;
+
+            // Вызвать удаление по ID в логике
+            logic.RemovePlayerByID(selectedPlayerId);
         }
         /// <summary>
         /// Ввод целого числа
@@ -129,7 +153,7 @@ namespace ConsoleApp1
         {
             Console.Clear();
             Position pos = logic.ConvertPosition(ChooseOption(logic.GetPositions(), "Выберите позицию"));
-            foreach (var player in logic.GroupByPosition(pos,logic.Players))
+            foreach (var player in logic.GroupByPosition(pos))
             {
                 Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
             }
@@ -141,8 +165,8 @@ namespace ConsoleApp1
         static void ShowGrouppedByNation()
         {
             Console.Clear();
-            string nation = logic.Players[(ChooseOption(logic.GetNationsArray(), "Выберите позицию"))].Nation;
-            foreach (var player in logic.GroupByNation(nation, logic.Players))
+            string nation = logic.GetNationsArray()[ChooseOption(logic.GetNationsArray(), "Выберите национальность")];
+            foreach (var player in logic.GroupByNation(nation))
             {
                 Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
             }
@@ -205,7 +229,7 @@ namespace ConsoleApp1
                 {
                     case 0:
                         Console.Clear();
-                        foreach (var player in logic.Players)
+                        foreach (var player in logic.LoadAllPlayers())
                         {
                             Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
                         }

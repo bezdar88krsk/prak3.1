@@ -8,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-
+using ProjectLogic;
 namespace Lab3._1
 {
     public partial class ChangeForm : Form

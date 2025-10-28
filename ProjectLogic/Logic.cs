@@ -4,12 +4,19 @@ using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
-namespace ModelLogic1
+using DataAccessLayer;
+using ModelLogic1;
+namespace ProjectLogic
 {
     public class Logic
     {
-        public BindingList<Player> Players = new BindingList<Player>() { new Player(1, 38, "lebron james", "usa", Position.PowerForward, 200, 100) };
+        public IRepository<Player> repository;
+        public DBContext dbContext =new DBContext();
+        public Logic()
+        {
+            repository = new EntityRepository<Player>(dbContext);
+        }
+        
         /// <summary>
         /// Метод, добавляющий игрока в коллекцию игроков
         /// </summary>
@@ -20,8 +27,8 @@ namespace ModelLogic1
         /// <param name="weight">Вес игрока</param>
         public void AddPlayer(int number, string name, string nation, Position position, int height, int weight)
         {
-            int LastID = Players.Last().ID;
-            Players.Add(new Player(LastID + 1, number, name, nation, position, height, weight));
+            repository.Add(new Player(number,name,nation,position,height,weight));
+           
         }
         /// <summary>
         /// Метод, удаляющий игрока из коллекции
@@ -29,13 +36,9 @@ namespace ModelLogic1
         /// <param name="playerID">ID игрока, которого необходимо удалить из коллекции</param>
         public void RemovePlayerByID(int playerID)
         {
-            foreach (Player p in Players)
+            foreach (Player p in repository.ReadAll())
             {
-                if (p.GetID() == playerID)
-                {
-                    Players.Remove(p);
-                    break;
-                }
+                repository.Delete(playerID);
             }
         }
         /// <summary>
@@ -44,7 +47,7 @@ namespace ModelLogic1
         /// <param name="index">индекс игрока, которого надо удаллить</param>
         public void RemovePlayerByIndex(int index)
         {
-            Players.RemoveAt(index);
+            repository.Delete(index);
         }
         /// <summary>
         /// Метод, изменяющий свойства игрока
@@ -57,18 +60,18 @@ namespace ModelLogic1
         /// <param name="weight">новый вес</param>
         public void ChangePlayerByID(int ID, int number, string name, string nation, Position position, int height, int weight)
         {
-            foreach (Player p in Players)
+            Player p = repository.ReadById(ID);
+            if (p != null)
             {
-                if (p.GetID() == ID)
-                {
-                    p.Number = number;
-                    p.Name = name;
-                    p.Nation = nation;
-                    p.Position = position;
-                    p.Weight = weight;
-                    p.Height = height;
-                }
+                p.Number = number;
+                p.Name = name;
+                p.Nation = nation;
+                p.Position = position;
+                p.Weight = weight;
+                p.Height = height;
+                repository.Update(p);
             }
+
 
         }
         /// <summary>
@@ -81,24 +84,16 @@ namespace ModelLogic1
         /// <param name="position">позиция игрока</param>
         /// <param name="height">рост игрока</param>
         /// <param name="weight">вес игрока</param>
-        public void ChangePlayerByIndex(int index, int number, string name, string nation, Position position, int height, int weight)
-        {
-            Players[index].Name = name;
-            Players[index].Nation = nation; 
-            Players[index].Position = position;
-            Players[index].Weight = weight;
-            Players[index].Height = height;
-            Players[index].Number = number;
-        }
+        
         /// <summary>
         /// Метод, возвращающий список сгруппированных по позиции
         /// </summary>
         /// <param name="position">Позиция, по которой происходит группировка</param>
         /// <returns>возвращает список отсортированный по позиции</returns>
-        public BindingList<Player> GroupByPosition(Position position, BindingList<Player> currentPlayers)
+        public List<Player> GroupByPosition(Position position)
         {
-            BindingList<Player> groupedPlayers = new BindingList<Player>(currentPlayers.Where(p => p.Position == position).ToList());
-            return groupedPlayers;
+            return  repository.ReadAll().Where(p => p.Position == position).ToList();
+            
         }
         /// <summary>
         /// Возвращает игрока по его ID
@@ -107,11 +102,7 @@ namespace ModelLogic1
         /// <returns>возвращает объект иргока</returns>
         public Player GetPlayer(int ID)
         {
-            foreach (Player p in Players)
-            {
-                if (p.ID == ID)
-                    return p;
-            }
+            return repository.ReadById(ID);
             return null;
         }
         /// <summary>
@@ -120,10 +111,9 @@ namespace ModelLogic1
         /// <param name="nation">национальность, по котрой группируем</param>
         /// <param name="currentPlayers">список, который отображается в данный момент</param>
         /// <returns>возвращает список сгруппированный по нациоанльности</returns>
-        public BindingList<Player> GroupByNation(string nation, BindingList<Player> currentPlayers)
+        public List<Player> GroupByNation(string nation)
         {
-            BindingList<Player> groupedPlayers = new BindingList<Player>(currentPlayers.Where(p => p.Nation == nation).ToList());
-            return groupedPlayers;
+            return repository.ReadAll().Where(p => p.Nation == nation).ToList();
         }
         /// <summary>
         /// Возвращает List<string> со всеми нациями сущесвтующих игроков
@@ -131,7 +121,7 @@ namespace ModelLogic1
         /// <returns>врзвращает списко строк национальностей</returns>
         public List<string> GetNations()
         {
-            return Players.Select(p => p.Nation).ToList();
+            return repository.ReadAll().Select(p => p.Nation).Distinct().ToList();
         }
         /// <summary>
         /// Возвращает string[] со всеми нациями сущесвтующих игроков
@@ -139,13 +129,13 @@ namespace ModelLogic1
         /// <returns>возвращает массив строк национальностей</returns>
         public string[] GetNationsArray()
         {
-            return Players.Select(p => p.Nation).ToArray();
+            return repository.ReadAll().Select(p => p.Nation).Distinct().ToArray();
         }
-       /// <summary>
-       /// Конвертирует текст в позицию
-       /// </summary>
-       /// <param name="text"></param>
-       /// <returns>возвращщает позицию</returns>
+        /// <summary>
+        /// Конвертирует текст в позицию
+        /// </summary>
+        /// <param name="text"></param>
+        /// <returns>возвращщает позицию</returns>
         public Position ConvertPosition(string text)
         {
             switch (text)
@@ -162,6 +152,10 @@ namespace ModelLogic1
 
             }
             return Position.Center;
+        }
+        public List<Player> LoadAllPlayers()
+        {
+            return repository.ReadAll().ToList();
         }
         /// <summary>
         /// Конвертирует номер в позицию
@@ -197,8 +191,8 @@ namespace ModelLogic1
         /// <returns>возвращает массив строк игрокав</returns>
         public string[] PlayersToStrings()
         {
-           
-            return Players.Select(p => $"{p.Name}, {p.Number}, {p.Nation}, {p.Position}, {p.Height}, {p.Weight}")
+
+            return repository.ReadAll().Select(p => $"{p.Name}, {p.Number}, {p.Nation}, {p.Position}, {p.Height}, {p.Weight}")
                           .ToArray();
         }
         /// <summary>
@@ -206,22 +200,22 @@ namespace ModelLogic1
         /// </summary>
         /// <param name="index"></param>
         /// <returns>возвращает обхект игрока по индексу в листе</returns>
-        public Player GetPlayerByIndex(int index)
-        {
-            return Players[index];
-        }
+        //public Player GetPlayerByIndex(int index)
+        //{
+        //    List<Player> players = repository.ReadAll().ToList();   // Получить всех игроков
+        //    int selectionIndex = ChooseOption(players.Select(p => p.Name).ToArray(), "Выберите игрока");
+        //    Player selectedPlayer = players[selectionIndex];
+        //}
         /// <summary>
         /// группирует по позиции и возвращает словарь позиция-игрок
         /// </summary>
         /// <returns>словарь позиция-игрок</returns>
         public Dictionary<Position, List<Player>> GroupPlayersByPosition()
         {
-            return Players.GroupBy(p => p.Position)
-                          .ToDictionary(g => g.Key, g => g.ToList());
+            return repository.ReadAll()
+            .GroupBy(p => p.Position)
+            .ToDictionary(g => g.Key, g => g.ToList());
         }
 
     }
-    }
-
-
-
+}

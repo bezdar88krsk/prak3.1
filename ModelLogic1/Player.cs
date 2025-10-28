@@ -44,6 +44,15 @@ namespace ModelLogic1
             Height = height;
             Weight = weight;
         }
+        public Player(int number, string name, string nation, Position position, int height, int weight)
+        {
+            Number = number;
+            Name = name;
+            Nation = nation;
+            Position = position;
+            Height = height;
+            Weight = weight;
+        }
         public int GetID()
         {
             return ID;
