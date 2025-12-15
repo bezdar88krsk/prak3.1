@@ -1,16 +1,13 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using ModelLogic1;
+﻿using ModelLogic1;
 using ProjectLogic;
+using System;
+using System.Linq;
+using Ninject;
 namespace ConsoleApp1
 {
     internal class Program
     {
-        static Logic logic = new Logic();
+        static ILogic logic;
         /// <summary>
         /// Запускает меню добавления игрока
         /// </summary>
@@ -28,7 +25,7 @@ namespace ConsoleApp1
             Console.WriteLine("Введите национальность игрока");
             string nation = Console.ReadLine();
             Console.Clear();
-            Position pos = logic.ConvertPosition(ChooseOption(logic.GetPositions(),"Выберите позицию"));
+            Position pos = logic.ConvertPosition(ChooseOption(logic.GetPositions(), "Выберите позицию"));
             Console.Clear();
             Console.WriteLine("Введите рост игрока");
             int height = IntInput();
@@ -36,7 +33,7 @@ namespace ConsoleApp1
             Console.WriteLine("Введите вес игрока");
             int weight = IntInput();
             Console.Clear();
-            logic.AddPlayer(number, name, nation, pos, height, weight);
+            logic.AddEntity(number, name, nation, pos, height, weight);
             Console.WriteLine("Игрок добавлен");
             Console.WriteLine("Нажмите любую клавишу, чтобы продолжить");
             Console.ReadKey();
@@ -48,16 +45,12 @@ namespace ConsoleApp1
         {
             Console.Clear();
 
-            // Получаем всех игроков
-            var players = logic.LoadAllPlayers();
+            var players = logic.LoadAllEntities();
 
-            // Массив строк с описанием игроков для меню выбора
             string[] playerDescriptions = players.Select(p => $"{p.Name} (ID: {p.ID})").ToArray();
 
-            // Выбор игрока по индексу в списке
             int selectedIndex = ChooseOption(playerDescriptions, "Выберите игрока");
 
-            // Получаем выбранного игрока по индексу
             Player selectedPlayer = players[selectedIndex];
 
             string name = selectedPlayer.Name;
@@ -100,8 +93,8 @@ namespace ConsoleApp1
                     break;
             }
 
-            
-            logic.ChangePlayerByID(selectedPlayer.ID, number, name, nation, position, height, weight);
+
+            logic.ChangeEntityByID(selectedPlayer.ID, number, name, nation, position, height, weight);
 
             Console.WriteLine("Игрок изменен");
             Console.WriteLine("Нажмите любую клавишу, чтобы продолжить");
@@ -112,19 +105,17 @@ namespace ConsoleApp1
         /// </summary>
         static void RemovePlayerOption()
         {
-            var players = logic.LoadAllPlayers();
+            var players = logic.LoadAllEntities();
 
-            // Создать массив строк для выбора игрока, например, "Имя (ID)"
-            string[] playerDescriptions = players.Select(p => $"{p.Number} {p.Name} (ID: {p.Position} {p.Nation}").ToArray();
+            string[] playerDescriptions = players.Select(p => $"{p.Number} {p.Name}  {p.Position} {p.Nation}").ToArray();
 
             // Запросить у пользователя выбор индекса из этого списка
             int selectedIndex = ChooseOption(playerDescriptions, "Выберите игрока");
 
-            // Получить ID выбранного игрока по его индексу в списке
+           
             int selectedPlayerId = players[selectedIndex].ID;
 
-            // Вызвать удаление по ID в логике
-            logic.RemovePlayerByID(selectedPlayerId);
+            logic.RemoveEntityByID(selectedPlayerId);
         }
         /// <summary>
         /// Ввод целого числа
@@ -135,7 +126,7 @@ namespace ConsoleApp1
             int result = 0;
             while (true)
             {
-                if(int.TryParse(Console.ReadLine(), out result))
+                if (int.TryParse(Console.ReadLine(), out result))
                 {
                     return result;
                 }
@@ -180,8 +171,8 @@ namespace ConsoleApp1
         /// <returns>возвращает индекс выбранного варианта</returns>
         static int ChooseOption(string[] menuItems, string text)
         {
-            
-            
+
+
             int selectedIndex = 0;
             ConsoleKey key;
             do
@@ -216,20 +207,22 @@ namespace ConsoleApp1
         }
         static void Main(string[] args)
         {
-            string[] menuItems = {"Просмотреть список игроков", "Добавить игрока", "Удалить игрока", "Изменить игрока", "Сгруппировать по позиции","Сгруппировать по национальности","Настоящая группировка", "Выход" };
+            IKernel kernel = new StandardKernel(new SimpleConfigModule());
+            logic = kernel.Get<Logic>();
+            string[] menuItems = { "Просмотреть список игроков", "Добавить игрока", "Удалить игрока", "Изменить игрока", "найти по позиции", "найти по национальности", "Настоящая группировка", "Выход" };
             Console.CursorVisible = false;
-            
+
             int choise = 0;
             do
             {
                 Console.Clear();
-                
+
                 choise = ChooseOption(menuItems, "Главное меню");
                 switch (choise)
                 {
                     case 0:
                         Console.Clear();
-                        foreach (var player in logic.LoadAllPlayers())
+                        foreach (var player in logic.LoadAllEntities())
                         {
                             Console.WriteLine("{0,-3}|{1,-4}|{2,-20}|{3,-12}|{4,-9}|{5,4}|{6,4}", player.ID, player.Number, player.Name, player.Nation, player.Position, player.Height, player.Weight);
                         }
@@ -239,7 +232,7 @@ namespace ConsoleApp1
                         AddPlayerOption();
 
                         break;
-                        case 2:
+                    case 2:
                         RemovePlayerOption();
                         break;
                     case 3:
@@ -264,14 +257,14 @@ namespace ConsoleApp1
                         }
                         Console.ReadKey();
                         break;
-                    
+
                 }
             } while (choise != 7);
-            Console.Clear ();
+            Console.Clear();
             Console.WriteLine("До свидания");
-            
 
-            
+
+
 
         }
     }

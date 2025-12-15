@@ -1,22 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using DataAccessLayer;
+﻿using DataAccessLayer;
 using ModelLogic1;
+using System.Collections.Generic;
+using System.Linq;
 namespace ProjectLogic
 {
-    public class Logic
+    public class Logic : ILogic
     {
-        public IRepository<Player> repository;
-        public DBContext dbContext =new DBContext();
-        public Logic()
+        public IRepository<Player> Repository { get; set; }
+        private readonly IPlayerOperations Operations;
+        private IPositionOperations PositionOperations { get; set; }
+        public Logic(IRepository<Player> repository, IPlayerOperations operations, IPositionOperations positionOperations)
         {
-            repository = new EntityRepository<Player>(dbContext);
+            Repository = repository;
+            Operations = operations;
+            PositionOperations = positionOperations;
         }
-        
+        //public Logic(IRepository<Player> repository)
+        //{
+        //    Repository = repository;
+        //}
         /// <summary>
         /// Метод, добавляющий игрока в коллекцию игроков
         /// </summary>
@@ -25,29 +27,29 @@ namespace ProjectLogic
         /// <param name="position">Позиция игрока на площадке</param>
         /// <param name="height">Рост игркоа</param>
         /// <param name="weight">Вес игрока</param>
-        public void AddPlayer(int number, string name, string nation, Position position, int height, int weight)
+        public void AddEntity(int number, string name, string nation, Position position, int height, int weight)
         {
-            repository.Add(new Player(number,name,nation,position,height,weight));
-           
+            Repository.Add(new Player(number, name, nation, position, height, weight));
+
         }
         /// <summary>
         /// Метод, удаляющий игрока из коллекции
         /// </summary>
         /// <param name="playerID">ID игрока, которого необходимо удалить из коллекции</param>
-        public void RemovePlayerByID(int playerID)
+        public void RemoveEntityByID(int entityID)
         {
-            foreach (Player p in repository.ReadAll())
+            foreach (Player p in Repository.ReadAll())
             {
-                repository.Delete(playerID);
+                Repository.Delete(entityID);
             }
         }
         /// <summary>
         /// Удаляет игрока по соответствующему индексу
         /// </summary>
         /// <param name="index">индекс игрока, которого надо удаллить</param>
-        public void RemovePlayerByIndex(int index)
+        public void RemoveEntityByIndex(int index)
         {
-            repository.Delete(index);
+            Repository.Delete(index);
         }
         /// <summary>
         /// Метод, изменяющий свойства игрока
@@ -58,33 +60,12 @@ namespace ProjectLogic
         /// <param name="position">новая позиция</param>
         /// <param name="height">новый рост</param>
         /// <param name="weight">новый вес</param>
-        public void ChangePlayerByID(int ID, int number, string name, string nation, Position position, int height, int weight)
+        public void ChangeEntityByID(int ID, int number, string name, string nation, Position position, int height, int weight)
         {
-            Player p = repository.ReadById(ID);
-            if (p != null)
-            {
-                p.Number = number;
-                p.Name = name;
-                p.Nation = nation;
-                p.Position = position;
-                p.Weight = weight;
-                p.Height = height;
-                repository.Update(p);
-            }
-
-
+            Operations.ChangePlayerByID(ID, number, name, nation, position,height, weight);
         }
-        /// <summary>
-        /// Изменяет игрока по индексу
-        /// </summary>
-        /// <param name="index">индекс нужного игрока</param>
-        /// <param name="number">номер игрока</param>
-        /// <param name="name">имя игрока</param>
-        /// <param name="nation">национальность игрока</param>
-        /// <param name="position">позиция игрока</param>
-        /// <param name="height">рост игрока</param>
-        /// <param name="weight">вес игрока</param>
         
+
         /// <summary>
         /// Метод, возвращающий список сгруппированных по позиции
         /// </summary>
@@ -92,18 +73,18 @@ namespace ProjectLogic
         /// <returns>возвращает список отсортированный по позиции</returns>
         public List<Player> GroupByPosition(Position position)
         {
-            return  repository.ReadAll().Where(p => p.Position == position).ToList();
-            
+            return Operations.GetByPosition(position).ToList();
+
         }
         /// <summary>
         /// Возвращает игрока по его ID
         /// </summary>
         /// <param name="ID">айди нудного игрока</param>
         /// <returns>возвращает объект иргока</returns>
-        public Player GetPlayer(int ID)
+        public Player GetEntity(int ID)
         {
-            return repository.ReadById(ID);
-            return null;
+            return Repository.ReadById(ID);
+
         }
         /// <summary>
         /// Группировка по национальности
@@ -113,7 +94,7 @@ namespace ProjectLogic
         /// <returns>возвращает список сгруппированный по нациоанльности</returns>
         public List<Player> GroupByNation(string nation)
         {
-            return repository.ReadAll().Where(p => p.Nation == nation).ToList();
+            return Operations.GetByNation(nation).ToList();
         }
         /// <summary>
         /// Возвращает List<string> со всеми нациями сущесвтующих игроков
@@ -121,7 +102,7 @@ namespace ProjectLogic
         /// <returns>врзвращает списко строк национальностей</returns>
         public List<string> GetNations()
         {
-            return repository.ReadAll().Select(p => p.Nation).Distinct().ToList();
+            return Operations.GetAllNations();
         }
         /// <summary>
         /// Возвращает string[] со всеми нациями сущесвтующих игроков
@@ -129,7 +110,7 @@ namespace ProjectLogic
         /// <returns>возвращает массив строк национальностей</returns>
         public string[] GetNationsArray()
         {
-            return repository.ReadAll().Select(p => p.Nation).Distinct().ToArray();
+            return Operations.GetNationsArray();  
         }
         /// <summary>
         /// Конвертирует текст в позицию
@@ -138,24 +119,15 @@ namespace ProjectLogic
         /// <returns>возвращщает позицию</returns>
         public Position ConvertPosition(string text)
         {
-            switch (text)
-            {
-                case "Center":
-                    return Position.Center;
-                case "PointGuard":
-                    return Position.PointGuard;
-                case "SmallForward":
-                    return Position.SmallForward;
-                case "PowerForward":
-                    return Position.PowerForward;
-
-
-            }
-            return Position.Center;
+            return PositionOperations.ConvertPosition(text);
         }
-        public List<Player> LoadAllPlayers()
+        /// <summary>
+        /// Возвращает список всех игроков из бд
+        /// </summary>
+        /// <returns></returns>
+        public List<Player> LoadAllEntities()
         {
-            return repository.ReadAll().ToList();
+            return Repository.ReadAll().ToList();
         }
         /// <summary>
         /// Конвертирует номер в позицию
@@ -164,18 +136,7 @@ namespace ProjectLogic
         /// <returns>возвращает обхект позиции</returns>
         public Position ConvertPosition(int index)
         {
-            switch (index)
-            {
-                case 0:
-                    return Position.PointGuard;
-                case 1:
-                    return Position.SmallForward;
-                case 2:
-                    return Position.PowerForward;
-                case 3:
-                    return Position.Center;
-            }
-            return Position.Center;
+           return PositionOperations.ConvertPosition(index);
         }
         /// <summary>
         /// Возвращает массив всех позиций
@@ -183,38 +144,27 @@ namespace ProjectLogic
         /// <returns>возвращает массив строк позиций</returns>
         public string[] GetPositions()
         {
-            return new string[] { "PointGuard", "SmallForward", "PowerForward", "Center" };
+            return PositionOperations.GetPositions();
         }
         /// <summary>
         /// Возвращает массив строк всех игроков
         /// </summary>
         /// <returns>возвращает массив строк игрокав</returns>
-        public string[] PlayersToStrings()
+        public string[] EntitiesToStrings()
         {
 
-            return repository.ReadAll().Select(p => $"{p.Name}, {p.Number}, {p.Nation}, {p.Position}, {p.Height}, {p.Weight}")
+            return Repository.ReadAll().Select(p => $"{p.Name}, {p.Number}, {p.Nation}, {p.Position}, {p.Height}, {p.Weight}")
                           .ToArray();
         }
-        /// <summary>
-        /// возвращает игрока по индексу в листе
-        /// </summary>
-        /// <param name="index"></param>
-        /// <returns>возвращает обхект игрока по индексу в листе</returns>
-        //public Player GetPlayerByIndex(int index)
-        //{
-        //    List<Player> players = repository.ReadAll().ToList();   // Получить всех игроков
-        //    int selectionIndex = ChooseOption(players.Select(p => p.Name).ToArray(), "Выберите игрока");
-        //    Player selectedPlayer = players[selectionIndex];
-        //}
+     
+       
         /// <summary>
         /// группирует по позиции и возвращает словарь позиция-игрок
         /// </summary>
         /// <returns>словарь позиция-игрок</returns>
         public Dictionary<Position, List<Player>> GroupPlayersByPosition()
         {
-            return repository.ReadAll()
-            .GroupBy(p => p.Position)
-            .ToDictionary(g => g.Key, g => g.ToList());
+            return Operations.GroupPlayersByPosition();
         }
 
     }

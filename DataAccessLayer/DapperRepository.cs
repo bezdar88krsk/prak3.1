@@ -1,53 +1,63 @@
 ﻿using Dapper;
 using ModelLogic1;
-using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using static Dapper.SqlMapper;
 namespace DataAccessLayer
 {
-    internal class DapperRepository<T> : IRepository<T> where T : class, IDomainObject
+    public class DapperRepository : IRepository<Player>
     {
         private readonly IDbConnection _db;
 
-        public DapperRepository(string connectionString)
+        public DapperRepository()
         {
+            string connectionString = "Data Source=(LocalDB)\\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\\Database1.mdf;Integrated Security=True;";
             _db = new SqlConnection(connectionString);
         }
 
-        public void Add(T entity)
+        public void Add(Player player)
         {
-            var insertQuery = $"INSERT INTO {typeof(T).Name}s (/*columns*/) VALUES (/*values*/); SELECT CAST(SCOPE_IDENTITY() as int)";
-            // Здесь нужно описать конкретный SQL для вставки по типу T, либо использовать динамическое построение SQL
-            throw new System.NotImplementedException("Здесь необходимо реализовать вставку с Dapper");
+            string insertQuery = $@"
+        INSERT INTO Players (Number, Name, Nation, Position, Height, Weight) 
+        VALUES (@Number, @Name, @Nation, @Position, @Height, @Weight);
+        SELECT CAST(SCOPE_IDENTITY() as int)";
+            var id = _db.ExecuteScalar<int>(insertQuery, player);
+            player.ID = id;
         }
 
         public void Delete(int id)
         {
-            var deleteQuery = $"DELETE FROM {typeof(T).Name}s WHERE ID = @Id";
+            string deleteQuery = $"DELETE FROM {typeof(Player).Name}s WHERE ID = @Id";
             _db.Execute(deleteQuery, new { Id = id });
         }
 
-        public IEnumerable<T> ReadAll()
+        public IEnumerable<Player> ReadAll()
         {
-            var selectQuery = $"SELECT * FROM {typeof(T).Name}s";
-            return _db.Query<T>(selectQuery).ToList();
+            string selectQuery = $"SELECT * FROM {typeof(Player).Name}s";
+            return _db.Query<Player>(selectQuery).ToList();
         }
 
-        public T ReadById(int id)
+        public Player ReadById(int id)
         {
-            var selectQuery = $"SELECT * FROM {typeof(T).Name}s WHERE ID = @Id";
-            return _db.QuerySingleOrDefault<T>(selectQuery, new { Id = id });
+            string selectQuery = $"SELECT * FROM {typeof(Player).Name}s WHERE ID = @Id";
+            return _db.QuerySingleOrDefault<Player>(selectQuery, new { Id = id });
         }
 
-        public void Update(T entity)
+        public void Update(Player player)
         {
-            var updateQuery = $"UPDATE {typeof(T).Name}s SET /*columns = values*/ WHERE ID = @Id";
-            
-            throw new System.NotImplementedException("Здесь необходимо реализовать обновление с Dapper");
+            string updateQuery = @"
+            UPDATE Players SET 
+                Number = @Number,
+                Name = @Name,
+                Nation = @Nation,
+                Position = @Position,
+                Height = @Height,
+                Weight = @Weight
+            WHERE ID = @ID";
+
+            _db.Execute(updateQuery, player);
         }
     }
 }

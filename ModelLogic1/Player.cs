@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace ModelLogic1
+﻿namespace ModelLogic1
 {
     public interface IDomainObject
     {

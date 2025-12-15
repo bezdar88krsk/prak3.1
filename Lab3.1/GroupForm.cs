@@ -1,21 +1,14 @@
 ﻿using ModelLogic1;
+using ProjectLogic;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using ProjectLogic;
-using static System.Windows.Forms.VisualStyles.VisualStyleElement;
 
 namespace Lab3._1
 {
     public partial class GroupForm : Form
     {
-        public GroupForm(Logic logic)
+        public GroupForm(ILogic logic)
         {
             InitializeComponent();
             listView1.Clear();
@@ -32,7 +25,7 @@ namespace Lab3._1
                 groups[pos] = group;
                 listView1.Groups.Add(group);
             }
-            var Players = logic.LoadAllPlayers();
+            var Players = logic.LoadAllEntities();
             foreach (var player in Players)
             {
                 var item = new ListViewItem(player.Name);
@@ -47,6 +40,11 @@ namespace Lab3._1
         }
 
         private void GroupForm_Load(object sender, EventArgs e)
+        {
+
+        }
+
+        private void listView1_SelectedIndexChanged(object sender, EventArgs e)
         {
 
         }

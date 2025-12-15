@@ -1,13 +1,6 @@
 ﻿using ModelLogic1;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Runtime.Remoting.Contexts;
-using System.Text;
-using System.Threading.Tasks;
-using static Dapper.SqlMapper;
 
 namespace DataAccessLayer
 {
@@ -17,7 +10,7 @@ namespace DataAccessLayer
         public EntityRepository(DBContext context)
         {
             _context = context;
-            
+
         }
         public void Add(T entity)
         {
@@ -48,7 +41,7 @@ namespace DataAccessLayer
         public void Update(T entity)
         {
             Player origin = _context.Set<Player>().Where(o => o.ID == entity.ID).FirstOrDefault();
-            if(origin != null)
+            if (origin != null)
             {
                 _context.Entry(origin).CurrentValues.SetValues(entity);
             }

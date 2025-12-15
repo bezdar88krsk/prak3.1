@@ -1,47 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows.Forms;
+﻿using ModelLogic1;
+using Ninject;
 using ProjectLogic;
-using ModelLogic1;
+using System;
+using System.ComponentModel;
+using System.Windows.Forms;
 namespace Lab3._1
 {
-    
+
     public partial class Form1 : Form
     {
-        Logic logic = new Logic();
+        private ILogic logic;
         public Form1()
         {
             InitializeComponent();
-            logic.AddPlayer(22, "a", "a", Position.Center, 2, 2);
+            IKernel kernel = new StandardKernel(new SimpleConfigModule());
+            logic = kernel.Get<Logic>();
+            logic.AddEntity(22, "a", "a", Position.Center, 2, 2);
             dataGridView1.ReadOnly = true;
             LoadPlayers();
             comboBox1.SelectedIndex = 0;
 
         }
+        /// <summary>
+        /// обновляет данные таблицы
+        /// </summary>
         private void LoadPlayers()
         {
-            
-            var players = logic.LoadAllPlayers();
+
+            var players = logic.LoadAllEntities();
             dataGridView1.DataSource = new BindingList<Player>(players);
         }
         private void button1_Click(object sender, EventArgs e)
         {
             Form addForm = new AddForm(logic);
             addForm.ShowDialog();
-            LoadPlayers(); 
+            LoadPlayers();
             checkBox1.Checked = false;
             checkBox2.Checked = false;
         }
 
         private void Form1_Load(object sender, EventArgs e)
         {
-            
+
         }
 
         private void button3_Click(object sender, EventArgs e)
@@ -49,7 +49,7 @@ namespace Lab3._1
             if (dataGridView1.SelectedCells.Count > 0)
             {
                 int playerId = Convert.ToInt32(dataGridView1.SelectedCells[0].Value);
-                logic.RemovePlayerByID(playerId);
+                logic.RemoveEntityByID(playerId);
                 LoadPlayers(); // Перезагрузка после удаления
             }
         }
@@ -61,7 +61,7 @@ namespace Lab3._1
                 int playerId = Convert.ToInt32(dataGridView1.SelectedCells[0].Value);
                 ChangeForm changeForm = new ChangeForm(playerId, logic);
                 changeForm.ShowDialog();
-                LoadPlayers(); // Перезагрузка после изменения
+                LoadPlayers();
             }
 
         }
