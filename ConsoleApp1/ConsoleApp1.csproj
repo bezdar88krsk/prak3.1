@@ -103,6 +103,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ConsoleView.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -118,6 +119,10 @@
     <ProjectReference Include="..\ProjectLogic\ProjectLogic.csproj">
       <Project>{99ad3fb8-8127-46fc-995e-07290d9f5d56}</Project>
       <Name>ProjectLogic</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\Shared\Shared.csproj">
+      <Project>{67458d39-8c1b-40a7-b760-35c37b2ec908}</Project>
+      <Name>Shared</Name>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

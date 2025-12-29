@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using Shared;
 namespace ProjectLogic
 {
     public interface ILogic
@@ -100,5 +100,59 @@ namespace ProjectLogic
         /// </summary>
         /// <returns></returns>
         Dictionary<Position, List<Player>> GroupPlayersByPosition();
+        /// <summary>
+        /// Загружает всех игроков в формате DTO для отображения в UI
+        /// </summary>
+        /// <returns>Список PlayerDto для View</returns>
+        IEnumerable<PlayerDto> LoadAllEntitiesDto();
+
+        /// <summary>
+        /// Добавляет нового игрока из DTO данных
+        /// </summary>
+        /// <param name="number">Номер игрока</param>
+        /// <param name="name">Имя и фамилия</param>
+        /// <param name="nation">Национальность</param>
+        /// <param name="position">Позиция как строка</param>
+        /// <param name="height">Рост</param>
+        /// <param name="weight">Вес</param>
+        void AddEntityDto(int number, string name, string nation, string position, int height, int weight);
+
+        /// <summary>
+        /// Изменяет существующего игрока по ID из DTO данных
+        /// </summary>
+        /// <param name="id">ID игрока</param>
+        /// <param name="number">Новый номер</param>
+        /// <param name="name">Новое имя</param>
+        /// <param name="nation">Новая национальность</param>
+        /// <param name="position">Новая позиция (строка)</param>
+        /// <param name="height">Новый рост</param>
+        /// <param name="weight">Новый вес</param>
+        void ChangeEntityByIdDto(int id, int number, string name, string nation, string position, int height, int weight);
+
+        /// <summary>
+        /// Удаляет игрока по ID
+        /// </summary>
+        /// <param name="id">ID игрока для удаления</param>
+        void RemoveEntityByIdDto(int id);
+
+        /// <summary>
+        /// Возвращает список позиций как строк для UI
+        /// </summary>
+        string[] GetPositionsDto();
+
+        /// <summary>
+        /// Возвращает список национальностей как строк для UI
+        /// </summary>
+        string[] GetNationsDto();
+
+        /// <summary>
+        /// Группирует игроков по позиции (DTO)
+        /// </summary>
+        IEnumerable<PlayerDto> GroupByPositionDto(string position);
+
+        /// <summary>
+        /// Группирует игроков по национальности (DTO)
+        /// </summary>
+        IEnumerable<PlayerDto> GroupByNationDto(string nation);
     }
 }

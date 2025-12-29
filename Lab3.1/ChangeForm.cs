@@ -1,40 +1,86 @@
 ﻿using ModelLogic1;
 using ProjectLogic;
+using Shared;
 using System;
+using System.Collections.Generic;
 using System.Windows.Forms;
 namespace Lab3._1
 {
-    public partial class ChangeForm : Form
+    public partial class ChangeForm : Form, IChangeFromView
     {
-        int PlayerId;
-        ILogic Logic;
+        public event EventHandler SaveButtonClicked;
+
         public ChangeForm()
         {
             InitializeComponent();
         }
-        public ChangeForm(int playerId, ILogic logic)
-        {
 
-            InitializeComponent();
-            PlayerId = playerId;
-            Logic = logic;
-            Player player = logic.GetEntity(PlayerId);
-            textBox1.Text = player.Name;
-            textBox2.Text = player.Number.ToString();
-            textBox3.Text = player.Nation;
-            textBox4.Text = player.Height.ToString();
-            textBox5.Text = player.Weight.ToString();
-            for (int i = 0; i < 4; i++)
-            {
-                comboBox1.SelectedIndex = i;
-                if (comboBox1.Text == player.Position.ToString())
-                    break;
-            }
-            //Logic.ChangePlayer(playerId, 22, "a", "a", Position.SmallForward, 22, 22);
+        private int _playerId;
+
+        public int PlayerId
+        {
+            get { return _playerId; }
+            set { _playerId = value; }
         }
+
+        public string PlayerName
+        {
+            get { return textBox1.Text; }
+            set { textBox1.Text = value; }
+        }
+
+        public string PlayerNumber
+        {
+            get { return textBox2.Text; }
+            set { textBox2.Text = value; }
+        }
+
+        public string PlayerNation
+        {
+            get { return textBox3.Text; }
+            set { textBox3.Text = value; }
+        }
+
+        public string PlayerPosition
+        {
+            get { return comboBox1.Text; }
+            set { comboBox1.Text = value; }
+        }
+
+        public string PlayerHeight
+        {
+            get { return textBox4.Text; }
+            set { textBox4.Text = value; }
+        }
+
+        public string PlayerWeight
+        {
+            get { return textBox5.Text; }
+            set { textBox5.Text = value; }
+        }
+
+        public void SetPositions(IEnumerable<string> positions)
+        {
+            comboBox1.Items.Clear();
+            foreach (string p in positions)
+            {
+                comboBox1.Items.Add(p);
+            }
+        }
+
+        public void CloseView()
+        {
+            this.Close();
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
-            Logic.ChangeEntityByID(PlayerId, Convert.ToInt32(textBox2.Text), textBox1.Text, textBox3.Text, Logic.ConvertPosition(comboBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text));
+            SaveButtonClicked?.Invoke(this, e);
+            MessageBox.Show("aaaaaa");
+        }
+
+        private void buttonCancel_Click(object sender, EventArgs e)
+        {
             this.Close();
         }
     }

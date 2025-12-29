@@ -135,7 +135,6 @@
             this.comboBox2.Name = "comboBox2";
             this.comboBox2.Size = new System.Drawing.Size(153, 21);
             this.comboBox2.TabIndex = 29;
-            this.comboBox2.Visible = false;
             // 
             // checkBox2
             // 
@@ -156,7 +155,6 @@
             this.button5.TabIndex = 27;
             this.button5.Text = "Сортировать";
             this.button5.UseVisualStyleBackColor = true;
-            this.button5.Visible = false;
             this.button5.Click += new System.EventHandler(this.button5_Click);
             // 
             // button6
@@ -188,7 +186,6 @@
             this.Controls.Add(this.button1);
             this.Name = "Form1";
             this.Text = "Form1";
-            this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();

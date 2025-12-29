@@ -1,5 +1,6 @@
 ﻿using DataAccessLayer;
 using ModelLogic1;
+using Ninject;
 using Ninject.Modules;
 using System;
 using System.Collections.Generic;
@@ -15,7 +16,10 @@ namespace ProjectLogic
         {
             Bind<IRepository<Player>>().To<EntityRepository<Player>>().InSingletonScope();
             Bind<IPlayerOperations>().To<PlayerWorkOperations>().InSingletonScope();
-            Bind<DbContext>().ToSelf().InSingletonScope();
+            Bind<DBContext>().ToSelf().InSingletonScope();              
+
+            Bind<DbContext>()
+                .ToMethod(ctx => ctx.Kernel.Get<DBContext>());
             Bind<IPositionOperations>().To<PositionWorkOperations>().InSingletonScope();
             Bind<ILogic>().To<Logic>().InSingletonScope();
         }

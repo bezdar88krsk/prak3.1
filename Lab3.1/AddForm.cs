@@ -1,31 +1,49 @@
 ﻿using ProjectLogic;
+using Shared;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Windows.Forms;
+
 namespace Lab3._1
 {
-    public partial class AddForm : Form
+    public partial class AddForm : Form, IAddFormView
     {
-        ILogic Logic = null;
+        public event EventHandler AddButtonClicked;
+
         public AddForm()
         {
             InitializeComponent();
         }
-        public AddForm(ILogic logic)
-        {
-            Logic = logic;
-            InitializeComponent();
 
+        public string PlayerName => textBox1.Text;
+        public string PlayerNumber => textBox2.Text;
+        public string PlayerNation => textBox3.Text;
+        public string PlayerPosition => comboBox1.Text;
+        public string PlayerHeight => textBox4.Text;
+        public string PlayerWeight => textBox5.Text;
+
+        public void SetPositions(IEnumerable<string> positions)
+        {
+            comboBox1.Items.Clear();
+            foreach (var p in positions)
+                comboBox1.Items.Add(p);
+            if (comboBox1.Items.Count > 0)
+                comboBox1.SelectedIndex = 0;
         }
+
+        public void CloseView()
+        {
+            this.Close();
+        }
+
         private void button1_Click(object sender, EventArgs e)
         {
+            AddButtonClicked?.Invoke(this, e);
+        }
 
-            if (!(string.IsNullOrWhiteSpace(textBox1.Text) || string.IsNullOrWhiteSpace(textBox2.Text) ||
-    string.IsNullOrWhiteSpace(textBox3.Text) || string.IsNullOrWhiteSpace(textBox4.Text) ||
-    string.IsNullOrWhiteSpace(textBox5.Text)))
-            {
-                Logic.AddEntity(Convert.ToInt32(textBox2.Text), textBox1.Text, textBox3.Text, Logic.ConvertPosition(comboBox1.Text), Convert.ToInt32(textBox4.Text), Convert.ToInt32(textBox5.Text));
-
-            }
+        private void button2_Click(object sender, EventArgs e)
+        {
             this.Close();
         }
     }

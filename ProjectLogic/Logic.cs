@@ -1,5 +1,7 @@
 ﻿using DataAccessLayer;
 using ModelLogic1;
+using Shared;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 namespace ProjectLogic
@@ -38,10 +40,7 @@ namespace ProjectLogic
         /// <param name="playerID">ID игрока, которого необходимо удалить из коллекции</param>
         public void RemoveEntityByID(int entityID)
         {
-            foreach (Player p in Repository.ReadAll())
-            {
-                Repository.Delete(entityID);
-            }
+            Repository.Delete(entityID);
         }
         /// <summary>
         /// Удаляет игрока по соответствующему индексу
@@ -165,6 +164,89 @@ namespace ProjectLogic
         public Dictionary<Position, List<Player>> GroupPlayersByPosition()
         {
             return Operations.GroupPlayersByPosition();
+        }
+        /// <summary>
+        /// Загружает всех игроков в формате DTO для отображения в UI
+        /// </summary>
+        /// <returns>Список PlayerDto для View</returns>
+        public IEnumerable<PlayerDto> LoadAllEntitiesDto()
+        {
+            return Repository.ReadAll().Select(MapToDto);
+        }
+
+        /// <summary>
+        /// Добавляет нового игрока из DTO данных
+        /// </summary>
+        public void AddEntityDto(int number, string name, string nation, string position, int height, int weight)
+        {
+            Position pos = (Position)Enum.Parse(typeof(Position), position);
+            Repository.Add(new Player(number, name, nation, pos, height, weight));
+        }
+
+        /// <summary>
+        /// Изменяет существующего игрока по ID из DTO данных
+        /// </summary>
+        public void ChangeEntityByIdDto(int id, int number, string name, string nation, string position, int height, int weight)
+        {
+            Position pos = (Position)Enum.Parse(typeof(Position), position);
+            Operations.ChangePlayerByID(id, number, name, nation, pos, height, weight);
+        }
+
+        /// <summary>
+        /// Удаляет игрока по ID
+        /// </summary>
+        public void RemoveEntityByIdDto(int id)
+        {
+            Repository.Delete(id);
+        }
+
+        /// <summary>
+        /// Возвращает список позиций как строк для UI
+        /// </summary>
+        public string[] GetPositionsDto()
+        {
+            return PositionOperations.GetPositions();
+        }
+
+        /// <summary>
+        /// Возвращает список национальностей как строк для UI
+        /// </summary>
+        public string[] GetNationsDto()
+        {
+            return Operations.GetNationsArray();
+        }
+
+        /// <summary>
+        /// Группирует игроков по позиции (DTO)
+        /// </summary>
+        public IEnumerable<PlayerDto> GroupByPositionDto(string positionStr)
+        {
+            Position pos = (Position)Enum.Parse(typeof(Position), positionStr);
+            return Operations.GetByPosition(pos).Select(MapToDto);
+        }
+
+        /// <summary>
+        /// Группирует игроков по национальности (DTO)
+        /// </summary>
+        public IEnumerable<PlayerDto> GroupByNationDto(string nation)
+        {
+            return Operations.GetByNation(nation).Select(MapToDto);
+        }
+
+        /// <summary>
+        /// Вспомогательный метод преобразования Entity в DTO
+        /// </summary>
+        private PlayerDto MapToDto(Player player)
+        {
+            PlayerDto dto = new PlayerDto();
+            dto.Id = player.ID;
+            dto.Number = player.Number;
+            dto.Name = player.Name;
+            dto.Nation = player.Nation;
+            dto.Position = player.Position.ToString();
+            dto.Height = player.Height;
+            dto.Weight = player.Weight;
+            return dto;
         }
 
     }
